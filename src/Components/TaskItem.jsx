@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import {deleteTask, toggleTask, updateTask } from '../Redux/slices/todoSlice';
+import { useDispatch } from 'react-redux';
 
 function TaskItem(props) {
+const dispatch = useDispatch();
+
+
+
 const [showField,setShowField] = useState(false) 
 
 const [title, setTitle] = useState('') 
@@ -12,7 +18,7 @@ useEffect(() => {
 function update(){
     setShowField(!showField)
     if (showField){
-        props.updateTask({...props.task, title})
+        dispatch(updateTask({...props.task, title}))
     }
 }
 
@@ -42,7 +48,7 @@ function update(){
                     {/* Buttons Section */}
                     <div className="flex space-x-2 ml-4">
                         <button
-                            onClick={() => props.toggleTask(props.task.id)}
+                            onClick={() => dispatch(toggleTask(props.task.id))}
                             className="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2"
                         >
                             Toggle
@@ -54,7 +60,7 @@ function update(){
                             {showField ? <span className='text-red-700' >Validate</span> : 'Update'}
                         </button>
                         <button
-                            onClick={() => props.deleteTask(props.task.id)}
+                            onClick={() => dispatch(deleteTask(props.task.id))}
                             className="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2"
                         >
                             Delete

@@ -1,24 +1,27 @@
 import React, { useEffect, useReducer, useState } from 'react'
 import { initialState, reducer } from '../Reducer';
+import { addTask } from '../Redux/slices/todoSlice';
+import { useDispatch } from 'react-redux';
 
 function TaskForm(props) {
     const [taskTitle, setTaskTitle] = useState('');
 
-useEffect(() => {
-    props.getTitle(taskTitle);
-}, [taskTitle])
-
-/* const [state, dispatch] = useReducer(reducer, initialState); */
+    const dispatch = useDispatch();
 
 function handleChange(event){
     event.preventDefault();
     setTaskTitle(event.target.value)
 } 
 
+function handleSubmit(event){
+    event.preventDefault();
+    dispatch(addTask( {id: Date.now(), title: taskTitle , completed: false}))
+}
+
     return (
     <>
         
-        <form className="w-full max-w-lg mx-auto" onSubmit={props.handleSubmit} >
+        <form className="w-full max-w-lg mx-auto" onSubmit={handleSubmit} >
             <div className="relative z-0 m-8 mb-2 group">
                 <input
                 onChange={handleChange}

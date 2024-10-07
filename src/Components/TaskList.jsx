@@ -2,8 +2,15 @@ import React, { useEffect, useReducer, useState } from 'react';
 import TaskItem from './TaskItem';
 import { initialState, reducer } from '../Reducer';
 import TaskForm from './TaskForm';
+import { useSelector } from 'react-redux';
+import TaskFilter from './TaskFilter';
+
 
 function TaskList() {
+const tasks = useSelector((state) => state.task.TaskList)
+
+const filter = useSelector((state) => state.task.filter)
+
     const loadTasksFromLocalStorage = () => {
         const storedTasks = localStorage.getItem('tasks');
         if (storedTasks) {
@@ -14,50 +21,25 @@ function TaskList() {
 
     const [state, dispatch] = useReducer(reducer, { TaskList: loadTasksFromLocalStorage() });
 
-    const [title, setTitle] = useState('');
 
     const [isFormVisible, setIsFormVisible] = useState(false); // State to manage form visibility
 
-/*     useEffect(() => {
-        const data = loadTasksFromLocalStorage()
-        console.log('data', data);
-        dispatch({
-            type: 'LOAD_STATE',
-            payload: loadTasksFromLocalStorage()
-        });
-    }, []) */
-    
+    function filtered(){
+        switch (filter){
+            case 'all': return tasks;
+
+            case 'active': return tasks.filter((item) => !item.completed)
+
+            case 'completed': return tasks.filter((item) => item.completed)
+
+            default : return tasks;
+        }
+    }
+
 useEffect(() => {
     localStorage.setItem('tasks', JSON.stringify(state.TaskList))
     console.log('brjvr')
 }, [state.TaskList])
-
-
-    const toggleTask = (taskId) => {
-        dispatch({ type: 'TOGGLE_TASK', payload: taskId });
-    };
-
-    const deleteTask = (taskId) => {
-        dispatch({ type: 'DELETE_TASK', payload: taskId });
-    };
-
-    const updateTask = (updatedTask) => {
-        dispatch({ type: 'UPDATE_TASK', payload: updatedTask });
-    };
-
-
-
-    function handleSubmit(event){
-        event.preventDefault();
-        dispatch({
-            type: 'ADD_TASK',
-            payload: {id: Date.now(), title: title , completed: false},
-        })
-    }
-
-    function getTitle(Title){
-        setTitle(Title)
-    }
 
     const toggleFormVisibility = () => {
       setIsFormVisible((prev) => !prev); // Toggle the form visibility
@@ -72,15 +54,13 @@ useEffect(() => {
             >
             New Task
         </button>
-        {isFormVisible && <TaskForm getTitle={getTitle} handleSubmit={handleSubmit}  toggleFormVisibility={toggleFormVisibility}/>} {/* Render TaskForm conditionally */}
+        {isFormVisible && <TaskForm toggleFormVisibility={toggleFormVisibility}/>} {/* Render TaskForm conditionally */}
+        <TaskFilter/>
         <ul>
-            {state.TaskList.map((task) => (
+            {filtered().map((task) => (
                 <TaskItem
                     key={task.id}
                     task={task}
-                    toggleTask={toggleTask}
-                    updateTask={updateTask} // pass the update function
-                    deleteTask={deleteTask} // pass the delete function
                 />
             ))}
         </ul>
